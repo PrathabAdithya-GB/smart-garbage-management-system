@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+{% block title %}Report an Issue{% endblock %}
+{% block page_title %}📢 Report Garbage Issue{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;">
+  <div class="card">
+    <div class="card-header">
+      <h3>📝 Submit New Complaint</h3>
+    </div>
+    <div class="card-body">
+
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data" id="complaintForm">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_address">📍 Address / Location <span style="color:red;">*</span></label>
+          <input type="text" name="address" id="id_address" class="form-control"
+                 placeholder="e.g., 45 Gandhi Street, Anna Nagar, Chennai"
+                 required maxlength="300">
+          <div class="form-hint">Enter the full address where garbage issue is located</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_landmark">🏛️ Landmark (Optional)</label>
+          <input type="text" name="landmark" id="id_landmark" class="form-control"
+                 placeholder="e.g., Near Post Office, Opposite Bus Stand"
+                 maxlength="200">
+          <div class="form-hint">Helps our team locate the exact spot faster</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_description">📄 Issue Description <span style="color:red;">*</span></label>
+          <textarea name="description" id="id_description" class="form-control"
+                    placeholder="Describe the garbage issue in detail. E.g., Garbage has not been collected for 3 days, overflowing bins, illegal dumping, etc."
+                    required rows="5"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_image">📷 Photo (Optional)</label>
+          <input type="file" name="image" id="id_image" class="form-control"
+                 accept="image/*" style="cursor:pointer;">
+          <div class="form-hint">Attach a photo of the garbage issue (JPG, PNG, max 5MB)</div>
+          <img id="imgPreview" src="" alt="Preview"
+               style="display:none;margin-top:12px;max-width:100%;max-height:200px;
+                      border-radius:8px;object-fit:cover;">
+        </div>
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;
+                    padding:14px;margin-bottom:20px;font-size:13px;color:#166534;">
+          ℹ️ Your complaint will be reviewed by our admin team. You can track the status from "Track Complaints".
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button type="submit" class="btn btn-primary">📤 Submit Complaint</button>
+          <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">← Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

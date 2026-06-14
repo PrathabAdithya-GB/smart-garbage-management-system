@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+{% block title %}Update Complaint #{{ complaint.id }}{% endblock %}
+{% block page_title %}✏️ Update Complaint #{{ complaint.id }}{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+  <!-- COMPLAINT INFO -->
+  <div class="card">
+    <div class="card-header"><h3>📄 Complaint Details</h3></div>
+    <div class="card-body">
+      <div class="detail-item">
+        <div class="detail-label">Submitted By</div>
+        <div class="detail-value">{{ complaint.user.get_full_name|default:complaint.user.username }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Address</div>
+        <div class="detail-value">{{ complaint.address }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Landmark</div>
+        <div class="detail-value">{{ complaint.landmark|default:"Not specified" }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Issue Description</div>
+        <div class="detail-value">{{ complaint.description }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Current Status</div>
+        <div class="detail-value">
+          <span class="status-badge status-{{ complaint.status|cut:' ' }}">{{ complaint.status }}</span>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Submitted On</div>
+        <div class="detail-value">{{ complaint.created_at|date:"d M Y, h:i A" }}</div>
+      </div>
+      {% if complaint.image %}
+      <div class="detail-item">
+        <div class="detail-label">Attached Photo</div>
+        <img src="{{ complaint.image.url }}" class="complaint-img" alt="Complaint image">
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- UPDATE FORM -->
+  <div class="card">
+    <div class="card-header"><h3>🔄 Update Status</h3></div>
+    <div class="card-body">
+      <form method="POST" id="statusUpdateForm">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="statusSelect">New Status</label>
+          <select name="status" id="statusSelect" class="form-control">
+            {% for s in status_choices %}
+              <option value="{{ s }}" {% if complaint.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="adminRemark">Admin Remark / Note</label>
+          <textarea name="admin_remark" id="adminRemark" class="form-control"
+                    placeholder="Add a note or update for the resident…" rows="4">{{ complaint.admin_remark }}</textarea>
+        </div>
+
+        <!-- Status flow guide -->
+        <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;color:#636e72;">
+          <strong>Status Flow:</strong>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;">⏳ Pending</span>
+            →
+            <span style="background:#cce5ff;color:#004085;padding:3px 10px;border-radius:12px;">🔧 In Progress</span>
+            →
+            <span style="background:#d5f5e3;color:#1e8449;padding:3px 10px;border-radius:12px;">✅ Completed</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;">
+          <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+          <a href="{% url 'manage_complaints' %}" class="btn btn-secondary">← Back</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

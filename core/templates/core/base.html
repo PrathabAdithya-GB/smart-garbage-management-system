@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Smart Garbage Management{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<div class="overlay" id="overlay"></div>
+<div class="wrapper">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-icon">♻️</div>
+      <div><h2><span>Smart</span> Garbage<br>Management</h2></div>
+    </div>
+    <nav class="sidebar-nav">
+      {% if user.profile.role == 'admin' %}
+        <span class="nav-label">Admin Panel</span>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="{% url 'manage_complaints' %}" class="nav-item"><span class="nav-icon">📋</span> Manage Complaints</a>
+      {% else %}
+        <span class="nav-label">Resident Portal</span>
+        <a href="{% url 'user_dashboard' %}" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="{% url 'report_complaint' %}" class="nav-item"><span class="nav-icon">📢</span> Report Issue</a>
+        <a href="{% url 'track_complaints' %}" class="nav-item"><span class="nav-icon">🔍</span> Track Complaints</a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{ user.first_name.0|upper|default:user.username.0|upper }}</div>
+        <div>
+          <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="user-role">{{ user.profile.get_role_display|default:"Resident" }}</div>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}" class="btn-logout">🚪 Logout</a>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
+      </div>
+      <div class="topbar-right">
+        {% if user.profile.role == 'admin' %}
+          <span class="badge-role admin">🛡️ Admin</span>
+        {% else %}
+          <span class="badge-role">👤 Resident</span>
+        {% endif %}
+      </div>
+    </header>
+    <main class="page-body">
+      {% if messages %}
+      <div class="messages-wrap">
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }}">
+            {% if msg.tags == 'success' %}✅{% elif msg.tags == 'error' %}❌{% else %}ℹ️{% endif %}
+            {{ msg }}
+          </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endif %}
+
+<script src="{% static 'core/js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

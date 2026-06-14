@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+{% block title %}Manage Complaints{% endblock %}
+{% block page_title %}📋 Manage Complaints{% endblock %}
+
+{% block content %}
+
+<!-- FILTERS -->
+<div class="card">
+  <div class="card-body" style="padding:16px 24px;">
+    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+      <div>
+        <label class="form-label" style="margin-bottom:4px;">Filter by Status</label>
+        <select name="status" class="form-control" style="width:auto;">
+          <option value="">All Status</option>
+          {% for s in status_choices %}
+            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <label class="form-label" style="margin-bottom:4px;">Search</label>
+        <input type="text" name="search" class="form-control"
+               placeholder="Search by name, address…" value="{{ search }}">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">🔍 Search</button>
+        <a href="{% url 'manage_complaints' %}" class="btn btn-secondary">✖ Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- COMPLAINTS TABLE -->
+<div class="card">
+  <div class="card-header">
+    <h3>All Complaints <span style="color:#6c757d;font-weight:400;font-size:14px;">({{ complaints|length }} found)</span></h3>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#ID</th>
+          <th>Resident</th>
+          <th>Address</th>
+          <th>Landmark</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in complaints %}
+        <tr>
+          <td><strong>#{{ c.id }}</strong></td>
+          <td>
+            <div style="font-weight:600;">{{ c.user.get_full_name|default:c.user.username }}</div>
+            <div style="font-size:12px;color:#6c757d;">@{{ c.user.username }}</div>
+          </td>
+          <td>{{ c.address }}</td>
+          <td>{{ c.landmark|default:"—" }}</td>
+          <td>{{ c.description|truncatechars:50 }}</td>
+          <td>
+            <span class="status-badge status-{{ c.status|cut:' ' }}">{{ c.status }}</span>
+          </td>
+          <td>{{ c.created_at|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url 'update_complaint' c.pk %}" class="btn btn-sm btn-warning">✏️ Update</a>
+            <a href="{% url 'complaint_detail' c.pk %}" class="btn btn-sm btn-info" style="margin-top:4px;">👁️ View</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <h4>No complaints found</h4>
+              <p>Try adjusting your filters</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

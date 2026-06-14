@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+{% block title %}Complaint #{{ complaint.id }} Details{% endblock %}
+{% block page_title %}📄 Complaint #{{ complaint.id }}{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;">
+  <div class="card">
+    <div class="card-header">
+      <h3>Complaint Details</h3>
+      <span class="status-badge status-{{ complaint.status|cut:' ' }}">{{ complaint.status }}</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <div>
+          <div class="detail-item">
+            <div class="detail-label">Complaint ID</div>
+            <div class="detail-value" style="font-size:18px;font-weight:700;">#{{ complaint.id }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Submitted By</div>
+            <div class="detail-value">{{ complaint.user.get_full_name|default:complaint.user.username }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Address</div>
+            <div class="detail-value">{{ complaint.address }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Landmark</div>
+            <div class="detail-value">{{ complaint.landmark|default:"Not specified" }}</div>
+          </div>
+        </div>
+        <div>
+          <div class="detail-item">
+            <div class="detail-label">Submitted On</div>
+            <div class="detail-value">{{ complaint.created_at|date:"d M Y, h:i A" }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Last Updated</div>
+            <div class="detail-value">{{ complaint.updated_at|date:"d M Y, h:i A" }}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Current Status</div>
+            <div class="detail-value">
+              <span class="status-badge status-{{ complaint.status|cut:' ' }}">{{ complaint.status }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item" style="margin-top:8px;">
+        <div class="detail-label">Issue Description</div>
+        <div class="detail-value" style="background:#f8f9fa;padding:14px;border-radius:8px;line-height:1.6;margin-top:6px;">
+          {{ complaint.description }}
+        </div>
+      </div>
+
+      {% if complaint.admin_remark %}
+      <div class="detail-item" style="margin-top:8px;">
+        <div class="detail-label">Admin Remark</div>
+        <div class="detail-value" style="background:#d5f5e3;border-left:4px solid #2ecc71;padding:14px;border-radius:8px;line-height:1.6;margin-top:6px;">
+          {{ complaint.admin_remark }}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if complaint.image %}
+      <div class="detail-item" style="margin-top:8px;">
+        <div class="detail-label">Attached Photo</div>
+        <img src="{{ complaint.image.url }}" class="complaint-img" alt="Complaint photo">
+      </div>
+      {% endif %}
+
+      <div style="margin-top:28px;padding-top:20px;border-top:1px solid #f1f3f4;">
+        <div class="detail-label" style="margin-bottom:12px;">Status Timeline</div>
+        <ul class="timeline">
+          <li class="timeline-item">
+            <div class="timeline-dot orange"></div>
+            <div>
+              <strong style="font-size:14px;">⏳ Pending</strong>
+              <div style="font-size:13px;color:#6c757d;">Complaint submitted – awaiting admin review</div>
+            </div>
+          </li>
+          <li class="timeline-item" {% if complaint.status == 'Pending' %}style="opacity:0.3;"{% endif %}>
+            <div class="timeline-dot blue"></div>
+            <div>
+              <strong style="font-size:14px;">🔧 In Progress</strong>
+              <div style="font-size:13px;color:#6c757d;">Admin acknowledged – team is working on it</div>
+            </div>
+          </li>
+          <li class="timeline-item" {% if complaint.status != 'Completed' %}style="opacity:0.3;"{% endif %}>
+            <div class="timeline-dot green"></div>
+            <div>
+              <strong style="font-size:14px;">✅ Completed</strong>
+              <div style="font-size:13px;color:#6c757d;">Issue has been resolved</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div style="margin-top:24px;display:flex;gap:12px;">
+        {% if user.profile.role == 'admin' %}
+          <a href="{% url 'update_complaint' complaint.pk %}" class="btn btn-warning">✏️ Update Status</a>
+          <a href="{% url 'manage_complaints' %}" class="btn btn-secondary">← Back to All</a>
+        {% else %}
+          <a href="{% url 'track_complaints' %}" class="btn btn-secondary">← My Complaints</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
